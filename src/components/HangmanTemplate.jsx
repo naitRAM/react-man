@@ -1,5 +1,16 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import HangmanWord from './HangmanWord';
+import HangmanGallows from './HangmanGallows';
+import HangmanHead from './HangmanHead';
+import HangmanBody from './HangmanBody';
+import HangmanRightArm from './HangmanRightArm';
+import HangmanLeftArm from './HangmanLeftArm';
+import HangmanRightLeg from './HangmanRightLeg';
+import HangmanLeftLeg from './HangmanLeftLeg';
+import HangmanRightEye from './HangmanRightEye';
+import HangmanLeftEye from './HangmanLeftEye';
+import HangmanFrown from './HangmanFrown';
+
 const HangmanTemplate = ({ phrase }) => {
     phrase = phrase.toLowerCase();
     const words = phrase.split(' ');
@@ -111,34 +122,20 @@ const HangmanTemplate = ({ phrase }) => {
         <>
             <svg width={xLimit} height="700" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
-                <rect x="50" y="650" height="10" width="150" rx="10" stroke="black" strokeWidth="10" />
-                <rect x="125" y="50" height="600" width="10" stroke="black" strokeWidth="10" />
-                <rect x="125" y="47.5" height="5" width="225" stroke="black" strokeWidth="5" />
-                <line x1="325" y1="50" x2="325" y2="100" stroke="black" strokeWidth="2.5" />
-
-                <circle cx="325" cy="150" r="50" stroke="black" strokeWidth="2.5" fill="none" />
-
-                <line x1="325" y1="200" x2="325" y2="400" stroke="black" strokeWidth="5" />
-
-                <line x1="325" y1="275" x2="250" y2="250" stroke="black" strokeWidth="5" />
-
-                <line x1="325" y1="275" x2="400" y2="250" stroke="black" strokeWidth="5" />
-
-                <line x1="325" y1="400" x2="250" y2="500" stroke="black" strokeWidth="5" />
-
-                <line x1="325" y1="400" x2="400" y2="500" stroke="black" strokeWidth="5" />
-
-                <line x1="300" y1="130" x2="315" y2="145" stroke="black" strokeWidth="2.5" />
-                <line x1="300" y1="145" x2="315" y2="130" stroke="black" strokeWidth="2.5" />
-
-                <line x1="335" y1="130" x2="350" y2="145" stroke="black" strokeWidth="2.5" />
-                <line x1="335" y1="145" x2="350" y2="130" stroke="black" strokeWidth="2.5" />
-
-                <path d="M 300 175 C 315 160 335 160 350 175" stroke="black" strokeWidth="2.5" fill="none" />
+                <HangmanGallows />
+                <HangmanHead />
+                <HangmanBody />
+                <HangmanRightArm />
+                <HangmanLeftArm />
+                <HangmanRightLeg />
+                <HangmanLeftLeg />
+                <HangmanRightEye />
+                <HangmanLeftEye />
+                <HangmanFrown />
 
                 {guessed.map((word, index) => {
                     return (
-                        <HangmanWord key={index}  word={word} row={index} x={initialX} y={initialY} />
+                        <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} />
                     );
                 })}
 
