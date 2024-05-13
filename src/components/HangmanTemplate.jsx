@@ -8,11 +8,17 @@ const HangmanTemplate = ({ phrase }) => {
 
     // values used to render initial underscores in place of unguessed letters
     const initialX = 450;
-    const xLimit = 1000;
+    let xLimit = 800;
     const initialY = 250;
 
     // find longestWord in phrase
     const longestWord = words.reduce((previous, current) => current.length > previous.length ? current : previous);
+
+    // width of SVG will depend on the size of the longest word in the phrase
+    // a longestWord length of 9 will fit perfectly within the initial xLimit width value
+    if (longestWord.length > 9) {
+        xLimit += 45 * (longestWord.length - 9)
+    }
     
     // set up state for keyboard
     const letters = "qwertyuiopasdfghjklzxcvbnm";
@@ -58,16 +64,13 @@ const HangmanTemplate = ({ phrase }) => {
         if (!letter) {
             return;
         }
-
         // get key status object to update
         const toUpdate = keyStatus[letter];
         
         if (phrase.includes(letter)) {
             // green if guess is good
             toUpdate['color'] = 'green';
-
             // update guess state so that guessed letters are revealed in the phrase
-
             const oldGuess = guessed;
             //need to keep unguessed letters masked
             const newGuess = words.map((word) => '_'.repeat(word.length));
@@ -103,11 +106,6 @@ const HangmanTemplate = ({ phrase }) => {
         console.log(allKeys);
         setKeyStatus(allKeys);
     };
-
-
-
-
-
 
     return (
         <>
@@ -150,10 +148,8 @@ const HangmanTemplate = ({ phrase }) => {
                 <circle cx="497" cy="545" r="15" strokeWidth="1" stroke="black" fill={keyStatus['w']['color']} />
                 <text x="490" y="550" id="w" onClick={click}>W</text>
 
-
                 <circle cx="535" cy="545" r="15" strokeWidth="1" stroke="black" fill={keyStatus['e']['color']} />
                 <text x="530" y="550" id="e" onClick={click}>E</text>
-
 
                 <circle cx="575" cy="545" r="15" strokeWidth="1" stroke="black" fill={keyStatus['r']['color']} />
                 <text x="570" y="550" id="r" onClick={click}>R</text>
@@ -226,10 +222,6 @@ const HangmanTemplate = ({ phrase }) => {
 
                 <rect x="748" y="630" height="30" width="75" fill="none" rx="10" strokeWidth="1" stroke="black" />
                 <text x="760" y="650" onClick={submit}>ENTER</text>
-
-
-
-
 
             </svg>
         </>
