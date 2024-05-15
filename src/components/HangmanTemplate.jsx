@@ -12,12 +12,13 @@ import HangmanLeftEye from './HangmanLeftEye';
 import HangmanFrown from './HangmanFrown';
 import HangmanInput from './HangmanInput';
 import HangmanEasyButton from './HangmanEasyButton';
+import HangmanHardButton from './HangmanHardButton';
 
 const HangmanTemplate = () => {
     const [phrase, setPhrase] = useState('');
     const [words, setWords] = useState([]);
     const [guessed, setGuessed] = useState([]);
-    const [easy, setIsEasy] = useState(true);
+    const [isEasy, setIsEasy] = useState(true);
     const [tries, setTries] = useState(0);
     const [xLimit, setXLimit] = useState(0);
     const [keyStatus, setKeyStatus] = useState({});
@@ -154,7 +155,6 @@ const HangmanTemplate = () => {
         if (e == undefined) {
             setTries(10);
         } else {
-            console.log(e.target.id);
             setTries(e.target.id == 'easy' ? 10 : 7);
             setIsEasy(e.target.id == 'easy');
         }
@@ -164,16 +164,16 @@ const HangmanTemplate = () => {
         <>
             <svg width={xLimit} height="700" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
-                {(easy && tries < 10) || (!easy && tries < 7) ? <HangmanGallows /> : ''}
-                {(easy && tries < 9) || (!easy && tries < 6) ? <HangmanHead /> : ''} 
-                {(easy && tries < 8) || (!easy && tries < 5) ? <HangmanBody /> : ''} 
-                {(easy && tries < 7) || (!easy && tries < 4) ? <HangmanRightArm /> : ''} 
-                {(easy && tries < 6) || (!easy && tries < 3) ? <HangmanLeftArm /> : ''} 
-                {(easy && tries < 5) || (!easy && tries < 2) ? <HangmanRightLeg /> : ''} 
-                {(easy && tries < 4) || (!easy && tries < 1) ? <HangmanLeftLeg /> : ''} 
-                {(easy && tries < 3) ? <HangmanRightEye /> : ''} 
-                {(easy && tries < 2) ? <HangmanLeftEye /> : ''} 
-                {(easy && tries < 1) ? <HangmanFrown /> : ''}
+                {(isEasy && tries < 10) || (!isEasy && tries < 7) ? <HangmanGallows /> : ''}
+                {(isEasy && tries < 9) || (!isEasy && tries < 6) ? <HangmanHead /> : ''} 
+                {(isEasy && tries < 8) || (!isEasy && tries < 5) ? <HangmanBody /> : ''} 
+                {(isEasy && tries < 7) || (!isEasy && tries < 4) ? <HangmanRightArm /> : ''} 
+                {(isEasy && tries < 6) || (!isEasy && tries < 3) ? <HangmanLeftArm /> : ''} 
+                {(isEasy && tries < 5) || (!isEasy && tries < 2) ? <HangmanRightLeg /> : ''} 
+                {(isEasy && tries < 4) || (!isEasy && tries < 1) ? <HangmanLeftLeg /> : ''} 
+                {(isEasy && tries < 3) ? <HangmanRightEye /> : ''} 
+                {(isEasy && tries < 2) ? <HangmanLeftEye /> : ''} 
+                {(isEasy && tries < 1) ? <HangmanFrown /> : ''}
 
                 
                 {!Object.keys(keyStatus).length ? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={play} />}
@@ -183,7 +183,8 @@ const HangmanTemplate = () => {
                         <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} />
                     );
                 })}
-                <HangmanEasyButton clickEasy={newGame}/>
+                <HangmanEasyButton isEasy={isEasy} clickEasy={newGame}/>
+                <HangmanHardButton isHard={!isEasy} clickHard={newGame}/>
 
             </svg>
         </>
