@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HangmanWord from './HangmanWord';
 import HangmanGallows from './HangmanGallows';
 import HangmanHead from './HangmanHead';
@@ -11,35 +11,27 @@ import HangmanRightEye from './HangmanRightEye';
 import HangmanLeftEye from './HangmanLeftEye';
 import HangmanFrown from './HangmanFrown';
 import HangmanInput from './HangmanInput';
+import HangmanEasyButton from './HangmanEasyButton';
 
-const HangmanTemplate = ({ phrase, easy = true }) => {
-    phrase = phrase.toLowerCase();
-    const words = phrase.split(' ');
-    // split the phrase to place individual words on separate rows
-    const [guessed, setGuessed] = useState(words.map((word) => '_'.repeat(word.length)));
-
-    const [tries, setTries] = useState(easy ? 10 : 7);
-    // values used to render initial underscores in place of unguessed letters
+const HangmanTemplate = () => {
+    const [phrase, setPhrase] = useState('');
+    const [words, setWords] = useState([]);
+    const [guessed, setGuessed] = useState([]);
+    const [easy, setIsEasy] = useState(true);
+    const [tries, setTries] = useState(0);
+    const [xLimit, setXLimit] = useState(0);
+    const [keyStatus, setKeyStatus] = useState({});
     const initialX = 450;
-    let xLimit = 900;
     const initialY = 250;
-
-    // find longestWord in phrase
-    const longestWord = words.reduce((previous, current) => current.length > previous.length ? current : previous);
-
-    // width of SVG will depend on the size of the longest word in the phrase
-    // a longestWord length of 9 will fit perfectly within the initial xLimit width value
-    if (longestWord.length > 9) {
-        xLimit += 45 * (longestWord.length - 9)
-    }
-    
-    // set up state for keyboard
     const letters = 'qwertyuiopasdfghjklzxcvbnm';
     let keyObj = {};
     letters.split('').forEach((letter) => {
         keyObj[letter] = { 'disabled': false, 'color': 'none' };
     });
-    const [keyStatus, setKeyStatus] = useState(keyObj);
+    
+    useEffect(()=> {
+        newGame();
+    }, []);
 
     const deselectKeys = (keyboardObj) => {
         for (let obj in keyboardObj) {
@@ -58,7 +50,7 @@ const HangmanTemplate = ({ phrase, easy = true }) => {
         return true;
     }
     // handler for letter selection
-    const click = (e) => {
+    const selectLetter = (e) => {
         if (!tries || isWin()) {
             return;
         }
@@ -144,10 +136,29 @@ const HangmanTemplate = ({ phrase, easy = true }) => {
         // update key object in copied keyboard status object then set this to new key status
         const allKeys = { ...keyStatus };
         allKeys[letter] = toUpdate;
-        console.log(allKeys);
         setKeyStatus(allKeys);
-        
     };
+
+    const newGame = (e) => {
+        setKeyStatus(keyObj);
+        const phrase = ["Onomatopoeia", "Hotel California", "The Great Escape"][Math.floor(Math.random() * 3)].toLowerCase();
+        setPhrase(phrase);
+        setWords(phrase.split(" "));
+        setGuessed(phrase.split(" ").map((word) => '_'.repeat(word.length)))
+        const longestWord = phrase.split(" ").reduce((previous, current) => current.length > previous.length ? current : previous);
+        if (longestWord.length > 9) {
+            setXLimit(900 + 45 * (longestWord.length - 9));
+        } else {
+            setXLimit(900);
+        }
+        if (e == undefined) {
+            setTries(10);
+        } else {
+            console.log(e.target.id);
+            setTries(e.target.id == 'easy' ? 10 : 7);
+            setIsEasy(e.target.id == 'easy');
+        }
+    }
 
     return (
         <>
@@ -165,13 +176,14 @@ const HangmanTemplate = ({ phrase, easy = true }) => {
                 {(easy && tries < 1) ? <HangmanFrown /> : ''}
 
                 
-                <HangmanInput keyStatus={keyStatus} click={click} submit={play} />
+                {!Object.keys(keyStatus).length ? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={play} />}
 
                 {guessed.map((word, index) => {
                     return (
                         <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} />
                     );
                 })}
+                <HangmanEasyButton clickEasy={newGame}/>
 
             </svg>
         </>

@@ -6,7 +6,7 @@ function App() {
 
   return (
     <>
-      <HangmanTemplate phrase="The Great Escape" easy={false}/>
+      <HangmanTemplate easy={false}/>
     </>
   )
 }
