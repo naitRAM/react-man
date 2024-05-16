@@ -6,7 +6,7 @@ function App() {
 
   return (
     <>
-      <HangmanTemplate easy={false}/>
+      <HangmanTemplate />
     </>
   )
 }

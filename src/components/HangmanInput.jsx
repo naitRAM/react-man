@@ -1,4 +1,4 @@
-const HangmanInput = ({ keyStatus, click, submit }) => {
+const HangmanInput = ({ keyStatus, click, submit, gameOver }) => {
     return (
         <>
             <circle cx="456" cy="545" r="15" strokeWidth="1" stroke="black" fill={keyStatus['q']['color']} />
@@ -80,7 +80,7 @@ const HangmanInput = ({ keyStatus, click, submit }) => {
             <text x="710" y="650" id="m" onClick={click}>M</text>
 
             <rect x="748" y="630" height="30" width="75" fill="none" rx="10" strokeWidth="1" stroke="black" />
-            <text x="760" y="650" onClick={submit}>ENTER</text>
+            <text x="760" y="650" onClick={submit}>{gameOver ? 'SHOW' : 'ENTER'}</text>
         </>
     );
 };

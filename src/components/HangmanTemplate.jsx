@@ -18,7 +18,9 @@ const HangmanTemplate = () => {
     const [phrase, setPhrase] = useState('');
     const [words, setWords] = useState([]);
     const [guessed, setGuessed] = useState([]);
+    const [guessedColors, setGuessedColors] = useState([]);
     const [isEasy, setIsEasy] = useState(true);
+    const [isOver, setIsOver] = useState(false);
     const [tries, setTries] = useState(0);
     const [xLimit, setXLimit] = useState(0);
     const [keyStatus, setKeyStatus] = useState({});
@@ -89,11 +91,10 @@ const HangmanTemplate = () => {
         const oldGuess = guessed;
         //need to keep unguessed letters masked
         const newGuess = words.map((word) => '_'.repeat(word.length));
-
+        let gameWon = true;
         newGuess.forEach((word, index) => {
             let newWord = '';
             for (let i = 0; i < word.length; i++) {
-
                 if (words[index][i] == letter) {
                     //reveal newly guessed letter
                     newWord += letter;
@@ -103,12 +104,14 @@ const HangmanTemplate = () => {
                 } else {
                     // mask unguessed letters
                     newWord += '_';
+                    gameWon = false;
                 }
             }
             // guessed state is passed to view where letters are displayed in uppercase
             newGuess[index] = newWord.toUpperCase();
         });
         setGuessed(newGuess);
+        return gameWon;
     }
 
     const play = (e) => {
@@ -125,15 +128,18 @@ const HangmanTemplate = () => {
         if (phrase.includes(letter)) {
             // green if guess is good
             toUpdate['color'] = 'green';
-            updateGuess(letter);
+            if (updateGuess(letter)) {
+                setIsOver(true);
+            }
         } else {
             // red if guess is wrong
+            if (tries == 1) {
+                setIsOver(true);
+            } 
             toUpdate['color'] = 'red';
             setTries(tries - 1);
-            
         }
         toUpdate['disabled'] = true;
-
         // update key object in copied keyboard status object then set this to new key status
         const allKeys = { ...keyStatus };
         allKeys[letter] = toUpdate;
@@ -145,7 +151,15 @@ const HangmanTemplate = () => {
         const phrase = ["Onomatopoeia", "Hotel California", "The Great Escape"][Math.floor(Math.random() * 3)].toLowerCase();
         setPhrase(phrase);
         setWords(phrase.split(" "));
-        setGuessed(phrase.split(" ").map((word) => '_'.repeat(word.length)))
+        setGuessed(phrase.split(" ").map((word) => '_'.repeat(word.length)));
+        setGuessedColors(phrase.split(" ").map((word) => {
+            let result = [];
+            let i = 0;
+            for (i; i < word.length; i++) {
+                result[i] = "black";
+            }
+            return result;
+        }));
         const longestWord = phrase.split(" ").reduce((previous, current) => current.length > previous.length ? current : previous);
         if (longestWord.length > 9) {
             setXLimit(900 + 45 * (longestWord.length - 9));
@@ -158,6 +172,24 @@ const HangmanTemplate = () => {
             setTries(e.target.id == 'easy' ? 10 : 7);
             setIsEasy(e.target.id == 'easy');
         }
+        setIsOver(false);
+    }
+
+    const showAnswer = () => {
+        
+        const newColors = guessed.map((word, index) => {
+            let arr = [];
+            for (let i = 0; i < word.length; i++) {
+                if (word[i] == "_") {
+                    arr[i] = "red";
+                } else {
+                    arr[i] = "black";
+                }
+            }
+            return arr;
+        });
+        setGuessedColors(newColors);
+        setGuessed(phrase.toUpperCase().split(' '));
     }
 
     return (
@@ -176,11 +208,11 @@ const HangmanTemplate = () => {
                 {(isEasy && tries < 1) ? <HangmanFrown /> : ''}
 
                 
-                {!Object.keys(keyStatus).length ? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={play} />}
+                {!Object.keys(keyStatus).length ? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={isOver ? showAnswer : play} gameOver={isOver} />}
 
                 {guessed.map((word, index) => {
                     return (
-                        <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} />
+                        <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} guessColors={guessedColors} />
                     );
                 })}
                 <HangmanEasyButton isEasy={isEasy} clickEasy={newGame}/>
