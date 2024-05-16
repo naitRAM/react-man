@@ -1,5 +1,5 @@
 const HangmanWord = ({ word, row, y, x, guessColors}) => {
-    console.log(guessColors);
+    
     return (
         <>
             {word.split('').map((letter, i) => {

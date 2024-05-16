@@ -16,14 +16,14 @@ import HangmanHardButton from './HangmanHardButton';
 
 const HangmanTemplate = () => {
     const [phrase, setPhrase] = useState('');
-    const [words, setWords] = useState([]);
     const [guessed, setGuessed] = useState([]);
     const [guessedColors, setGuessedColors] = useState([]);
     const [isEasy, setIsEasy] = useState(true);
-    const [isOver, setIsOver] = useState(false);
-    const [tries, setTries] = useState(0);
+    const [isWin, setIsWin] = useState(false);
+    const [remaining, setRemaining] = useState(0);
     const [xLimit, setXLimit] = useState(0);
     const [keyStatus, setKeyStatus] = useState({});
+    const [answerShown, setAnswerShown] = useState(false);
     const initialX = 450;
     const initialY = 250;
     const letters = 'qwertyuiopasdfghjklzxcvbnm';
@@ -44,17 +44,9 @@ const HangmanTemplate = () => {
         }
     }
 
-    const isWin = () => {
-        for (let i = 0; i < guessed.length; i++) {
-            if (guessed[i].includes('_')) {
-                return false;
-            }
-        }
-        return true;
-    }
     // handler for letter selection
     const selectLetter = (e) => {
-        if (!tries || isWin()) {
+        if (!remaining || isWin) {
             return;
         }
         const letter = e.target.id;
@@ -90,7 +82,9 @@ const HangmanTemplate = () => {
         // update guess state so that guessed letters are revealed in the phrase
         const oldGuess = guessed;
         //need to keep unguessed letters masked
+        const words = phrase.split(' ');
         const newGuess = words.map((word) => '_'.repeat(word.length));
+        
         let gameWon = true;
         newGuess.forEach((word, index) => {
             let newWord = '';
@@ -115,9 +109,7 @@ const HangmanTemplate = () => {
     }
 
     const play = (e) => {
-        
         const letter = getSelectedLetter();
-        
         // in case no key was selected
         if (!letter) {
             return;
@@ -129,15 +121,13 @@ const HangmanTemplate = () => {
             // green if guess is good
             toUpdate['color'] = 'green';
             if (updateGuess(letter)) {
-                setIsOver(true);
+                // updateGuess returns true if the phrase has been guessed
+                setIsWin(true);
             }
         } else {
             // red if guess is wrong
-            if (tries == 1) {
-                setIsOver(true);
-            } 
             toUpdate['color'] = 'red';
-            setTries(tries - 1);
+            setRemaining(remaining - 1);
         }
         toUpdate['disabled'] = true;
         // update key object in copied keyboard status object then set this to new key status
@@ -150,7 +140,6 @@ const HangmanTemplate = () => {
         setKeyStatus(keyObj);
         const phrase = ["Onomatopoeia", "Hotel California", "The Great Escape"][Math.floor(Math.random() * 3)].toLowerCase();
         setPhrase(phrase);
-        setWords(phrase.split(" "));
         setGuessed(phrase.split(" ").map((word) => '_'.repeat(word.length)));
         setGuessedColors(phrase.split(" ").map((word) => {
             let result = [];
@@ -160,6 +149,8 @@ const HangmanTemplate = () => {
             }
             return result;
         }));
+        setIsWin(false);
+        setAnswerShown(false);
         const longestWord = phrase.split(" ").reduce((previous, current) => current.length > previous.length ? current : previous);
         if (longestWord.length > 9) {
             setXLimit(900 + 45 * (longestWord.length - 9));
@@ -167,16 +158,17 @@ const HangmanTemplate = () => {
             setXLimit(900);
         }
         if (e == undefined) {
-            setTries(10);
+            setRemaining(10);
         } else {
-            setTries(e.target.id == 'easy' ? 10 : 7);
+            setRemaining(e.target.id == 'easy' ? 10 : 7);
             setIsEasy(e.target.id == 'easy');
         }
-        setIsOver(false);
     }
 
     const showAnswer = () => {
-        
+        if (answerShown) {
+            return;
+        }
         const newColors = guessed.map((word, index) => {
             let arr = [];
             for (let i = 0; i < word.length; i++) {
@@ -188,27 +180,29 @@ const HangmanTemplate = () => {
             }
             return arr;
         });
+        
         setGuessedColors(newColors);
         setGuessed(phrase.toUpperCase().split(' '));
+        setAnswerShown(true);
     }
 
     return (
         <>
             <svg width={xLimit} height="700" version="1.1" xmlns="http://www.w3.org/2000/svg">
 
-                {(isEasy && tries < 10) || (!isEasy && tries < 7) ? <HangmanGallows /> : ''}
-                {(isEasy && tries < 9) || (!isEasy && tries < 6) ? <HangmanHead /> : ''} 
-                {(isEasy && tries < 8) || (!isEasy && tries < 5) ? <HangmanBody /> : ''} 
-                {(isEasy && tries < 7) || (!isEasy && tries < 4) ? <HangmanRightArm /> : ''} 
-                {(isEasy && tries < 6) || (!isEasy && tries < 3) ? <HangmanLeftArm /> : ''} 
-                {(isEasy && tries < 5) || (!isEasy && tries < 2) ? <HangmanRightLeg /> : ''} 
-                {(isEasy && tries < 4) || (!isEasy && tries < 1) ? <HangmanLeftLeg /> : ''} 
-                {(isEasy && tries < 3) ? <HangmanRightEye /> : ''} 
-                {(isEasy && tries < 2) ? <HangmanLeftEye /> : ''} 
-                {(isEasy && tries < 1) ? <HangmanFrown /> : ''}
+                {(isEasy && remaining < 10) || (!isEasy && remaining < 7) ? <HangmanGallows /> : ''}
+                {(isEasy && remaining < 9) || (!isEasy && remaining < 6) ? <HangmanHead /> : ''} 
+                {(isEasy && remaining < 8) || (!isEasy && remaining < 5) ? <HangmanBody /> : ''} 
+                {(isEasy && remaining < 7) || (!isEasy && remaining < 4) ? <HangmanRightArm /> : ''} 
+                {(isEasy && remaining < 6) || (!isEasy && remaining < 3) ? <HangmanLeftArm /> : ''} 
+                {(isEasy && remaining < 5) || (!isEasy && remaining < 2) ? <HangmanRightLeg /> : ''} 
+                {(isEasy && remaining < 4) || (!isEasy && remaining < 1) ? <HangmanLeftLeg /> : ''} 
+                {(isEasy && remaining < 3) ? <HangmanRightEye /> : ''} 
+                {(isEasy && remaining < 2) ? <HangmanLeftEye /> : ''} 
+                {(isEasy && remaining < 1) ? <HangmanFrown /> : ''}
 
                 
-                {!Object.keys(keyStatus).length ? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={isOver ? showAnswer : play} gameOver={isOver} />}
+                {!Object.keys(keyStatus).length ? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={!remaining ? showAnswer : play} isLoss={remaining == 0} answerShown={answerShown} />}
 
                 {guessed.map((word, index) => {
                     return (
