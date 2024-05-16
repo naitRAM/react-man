@@ -209,8 +209,8 @@ const HangmanTemplate = () => {
                         <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} guessColors={guessedColors} />
                     );
                 })}
-                <HangmanEasyButton isEasy={isEasy} clickEasy={newGame}/>
-                <HangmanHardButton isHard={!isEasy} clickHard={newGame}/>
+                <HangmanEasyButton isHighlighted={isEasy && !(isWin || remaining == 0)} clickEasy={newGame}/>
+                <HangmanHardButton isHighlighted={!isEasy && !(isWin || remaining == 0)} clickHard={newGame}/>
 
             </svg>
         </>
