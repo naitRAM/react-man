@@ -142,7 +142,7 @@ const HangmanTemplate = () => {
         setKeyStatus(keyObj);
         let phrase;
         try {
-            const res = await fetch("/api/phrasesz");
+            const res = await fetch("/api/phrases");
             const data = await res.json();
             phrase = data[Math.floor(Math.random() * data.length)].phrase.toLowerCase();
         } catch (error) {
