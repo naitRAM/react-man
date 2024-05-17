@@ -1,0 +1,20 @@
+{
+    "phrases": [
+        {
+            "phrase": "Hotel California",
+            "category": "Music",
+            "hint": "No checkout"
+        },
+        {
+            "phrase": "Mount Kilimanjaro",
+            "category": "Landmark",
+            "hint": "Somewhere in Africa"
+
+        },
+        {
+            "phrase": "Platypus",
+            "category": "Animals",
+            "hint": "An unusual mammal"
+        }
+    ]
+}

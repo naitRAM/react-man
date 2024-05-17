@@ -98,6 +98,8 @@ const HangmanTemplate = () => {
                 } else {
                     // mask unguessed letters
                     newWord += '_';
+                    // if newGuess contains underscores, game will not be won
+                    // function will return this value to set isWin to true in play()
                     gameWon = false;
                 }
             }
@@ -136,9 +138,17 @@ const HangmanTemplate = () => {
         setKeyStatus(allKeys);
     };
 
-    const newGame = (e) => {
+    const newGame = async (e) => {
         setKeyStatus(keyObj);
-        const phrase = ["Onomatopoeia", "Hotel California", "The Great Escape"][Math.floor(Math.random() * 3)].toLowerCase();
+        let phrase;
+        try {
+            const res = await fetch("/api/phrasesz");
+            const data = await res.json();
+            phrase = data[Math.floor(Math.random() * data.length)].phrase.toLowerCase();
+        } catch (error) {
+            console.log('error');
+            return;
+        }
         setPhrase(phrase);
         setGuessed(phrase.split(" ").map((word) => '_'.repeat(word.length)));
         setGuessedColors(phrase.split(" ").map((word) => {
