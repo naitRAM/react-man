@@ -24,14 +24,14 @@ const HangmanTemplate = () => {
     const [guessedColors, setGuessedColors] = useState([]);
     const [category, setCategory] = useState('');
     const [hint, setHint] = useState('');
-    const [isEasy, setIsEasy] = useState(true);
+    const [isEasy, setIsEasy] = useState(false);
     const [isWin, setIsWin] = useState(false);
     const [remaining, setRemaining] = useState(0);
     const [xLimit, setXLimit] = useState(0);
     const [keyStatus, setKeyStatus] = useState({});
     const [answerShown, setAnswerShown] = useState(false);
     const [errorLoading, setErrorLoading] = useState(false);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [categoryShown, setCategoryShown] = useState(false);
     const [hintShown, setHintShown] = useState(false);
     const initialX = 450;
@@ -159,8 +159,6 @@ const HangmanTemplate = () => {
         });
     }
 
-
-
     const newGame = async (e) => {
         let data;
         let dataObj;
@@ -168,13 +166,13 @@ const HangmanTemplate = () => {
         setLoading(true);
         setGuessedColors(getDefaultGuessedColors('Loading...'.toLowerCase().split(' ')));
         setGuessed('Loading...'.toUpperCase().split(' '));
+        setXLimit(900);
         try {
             const res = await fetch('/api/phrases');
             data = await res.json();
             dataObj = data[Math.floor(Math.random() * data.length)];
         } catch (error) {
             console.log('error');
-            setXLimit(900);
             setLoading(false);
             setErrorLoading(true);
             setGuessedColors(getDefaultGuessedColors('Error Loading Phrase'.toLowerCase().split(' ')));
@@ -194,12 +192,13 @@ const HangmanTemplate = () => {
         setIsWin(false);
         setAnswerShown(false);
         const longestWord = dataObj.phrase.split(" ").reduce((previous, current) => current.length > previous.length ? current : previous);
-        if (longestWord.length > 9) {
-            setXLimit(900 + 45 * (longestWord.length - 9));
+        if (longestWord.length > 11) {
+            setXLimit(900 + 45 * (longestWord.length - 11));
         } else {
             setXLimit(900);
         }
         if (e == undefined) {
+            setIsEasy(true);
             setRemaining(10);
         } else {
             setRemaining(e.target.id == 'easy' ? 10 : 7);
@@ -222,7 +221,6 @@ const HangmanTemplate = () => {
             }
             return arr;
         });
-        
         setGuessedColors(newColors);
         setGuessed(phrase.toUpperCase().split(' '));
         setAnswerShown(true);
