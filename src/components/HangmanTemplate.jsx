@@ -30,7 +30,8 @@ const HangmanTemplate = () => {
     const [xLimit, setXLimit] = useState(0);
     const [keyStatus, setKeyStatus] = useState({});
     const [answerShown, setAnswerShown] = useState(false);
-    const [errorLoading, setErrorLoading] = useState(true);
+    const [errorLoading, setErrorLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [categoryShown, setCategoryShown] = useState(false);
     const [hintShown, setHintShown] = useState(false);
     const initialX = 450;
@@ -147,32 +148,45 @@ const HangmanTemplate = () => {
         setKeyStatus(allKeys);
     };
 
-    const newGame = async (e) => {
-        let data;
-        let dataObj;
-        try {
-            const res = await fetch("/api/phrases");
-            data = await res.json();
-            dataObj = data[Math.floor(Math.random() * data.length)];
-        } catch (error) {
-            console.log('error');
-            setXLimit(900);
-            setErrorLoading(true);
-            return;
-        }
-        
-        setErrorLoading(false);
-        setKeyStatus(keyObj);
-        setPhrase(dataObj.phrase.toLowerCase());
-        setGuessed(dataObj.phrase.toLowerCase().split(" ").map((word) => '_'.repeat(word.length)));
-        setGuessedColors(dataObj.phrase.toLowerCase().split(" ").map((word) => {
+    const getDefaultGuessedColors = (words) => {
+        return words.map((word) => {
             let result = [];
             let i = 0;
             for (i; i < word.length; i++) {
                 result[i] = "black";
             }
             return result;
-        }));
+        });
+    }
+
+
+
+    const newGame = async (e) => {
+        let data;
+        let dataObj;
+        setErrorLoading(false);
+        setLoading(true);
+        setGuessedColors(getDefaultGuessedColors('Loading...'.toLowerCase().split(' ')));
+        setGuessed('Loading...'.toUpperCase().split(' '));
+        try {
+            const res = await fetch('/api/phrases');
+            data = await res.json();
+            dataObj = data[Math.floor(Math.random() * data.length)];
+        } catch (error) {
+            console.log('error');
+            setXLimit(900);
+            setLoading(false);
+            setErrorLoading(true);
+            setGuessedColors(getDefaultGuessedColors('Error Loading Phrase'.toLowerCase().split(' ')));
+            setGuessed('Error Loading Phrase'.toUpperCase().split(' '));
+            return;
+        }
+        setLoading(false);
+        setErrorLoading(false);
+        setKeyStatus(keyObj);
+        setPhrase(dataObj.phrase.toLowerCase());
+        setGuessed(dataObj.phrase.toLowerCase().split(" ").map((word) => '_'.repeat(word.length)));
+        setGuessedColors(getDefaultGuessedColors(dataObj.phrase.toLowerCase().split(" ")));
         setCategory(dataObj.category || '');
         setCategoryShown(false);
         setHint(dataObj.hint || '');
@@ -218,29 +232,29 @@ const HangmanTemplate = () => {
         <>
             <svg width={xLimit} height="700" version="1.1" xmlns="http://www.w3.org/2000/svg">
             
-                {errorLoading || (isEasy && remaining < 10) || (!isEasy && remaining < 7) ? <HangmanGallows /> : ''}
-                {errorLoading || (isEasy && remaining < 9) || (!isEasy && remaining < 6) ? <HangmanHead /> : ''} 
-                {errorLoading || (isEasy && remaining < 8) || (!isEasy && remaining < 5) ? <HangmanBody /> : ''} 
-                {errorLoading || (isEasy && remaining < 7) || (!isEasy && remaining < 4) ? <HangmanRightArm /> : ''} 
-                {errorLoading || (isEasy && remaining < 6) || (!isEasy && remaining < 3) ? <HangmanLeftArm /> : ''} 
-                {errorLoading || (isEasy && remaining < 5) || (!isEasy && remaining < 2) ? <HangmanRightLeg /> : ''} 
-                {errorLoading || (isEasy && remaining < 4) || (!isEasy && remaining < 1) ? <HangmanLeftLeg /> : ''} 
-                {errorLoading || (isEasy && remaining < 3) ? <HangmanRightEye /> : ''} 
-                {errorLoading || (isEasy && remaining < 2) ? <HangmanLeftEye /> : ''} 
-                {errorLoading || (isEasy && remaining < 1) ? <HangmanFrown /> : ''}
+                {loading || errorLoading || (isEasy && remaining < 10) || (!isEasy && remaining < 7) ? <HangmanGallows /> : ''}
+                {loading || errorLoading || (isEasy && remaining < 9) || (!isEasy && remaining < 6) ? <HangmanHead /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 8) || (!isEasy && remaining < 5) ? <HangmanBody /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 7) || (!isEasy && remaining < 4) ? <HangmanRightArm /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 6) || (!isEasy && remaining < 3) ? <HangmanLeftArm /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 5) || (!isEasy && remaining < 2) ? <HangmanRightLeg /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 4) || (!isEasy && remaining < 1) ? <HangmanLeftLeg /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 3) ? <HangmanRightEye /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 2) ? <HangmanLeftEye /> : ''} 
+                {loading || errorLoading || (isEasy && remaining < 1) ? <HangmanFrown /> : ''}
 
-                {errorLoading ?  '' : <HangmanRemainingLabel misses={remaining} isEasy={isEasy} />}
-                {errorLoading || !category ? '' : <HangmanCategoryLabel category={category} alreadyShown={categoryShown} setAlreadyShown={setCategoryShown} />}
-                {errorLoading || !hint ? '' : <HangmanHintLabel hint={hint} alreadyShown={hintShown} setAlreadyShown={setHintShown} />}
-                {errorLoading || !Object.keys(keyStatus).length? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={!remaining ? showAnswer : play} isLoss={remaining == 0} answerShown={answerShown} />}
+                {loading || errorLoading ?  '' : <HangmanRemainingLabel misses={remaining} isEasy={isEasy} />}
+                {loading || errorLoading || !category ? '' : <HangmanCategoryLabel category={category} alreadyShown={categoryShown} setAlreadyShown={setCategoryShown} />}
+                {loading || errorLoading || !hint ? '' : <HangmanHintLabel hint={hint} alreadyShown={hintShown} setAlreadyShown={setHintShown} />}
+                {loading || errorLoading || !Object.keys(keyStatus).length? '' : <HangmanInput keyStatus={keyStatus} click={selectLetter} submit={!remaining ? showAnswer : play} isLoss={remaining == 0} answerShown={answerShown} />}
 
                 {guessed.map((word, index) => {
                     return (
-                        errorLoading ? '' : <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} guessColors={guessedColors} />
+                        <HangmanWord key={index} word={word} row={index} x={initialX} y={initialY} guessColors={guessedColors} />
                     );
                 })}
-                {errorLoading ? '' : <HangmanEasyButton isHighlighted={isEasy && !(isWin || remaining == 0)} clickEasy={newGame}/>}
-                {errorLoading ? '' : <HangmanHardButton isHighlighted={!isEasy && !(isWin || remaining == 0)} clickHard={newGame}/>}
+                {errorLoading ? <HangmanEasyButton isHighlighted={false} clickEasy={newGame}/> : (loading ? '' : <HangmanEasyButton isHighlighted={isEasy && !(isWin || remaining == 0)} clickEasy={newGame}/>)}
+                {errorLoading ? <HangmanHardButton isHighlighted={false} clickHard={newGame}/> : (loading ? '' : <HangmanHardButton isHighlighted={!isEasy && !(isWin || remaining == 0)} clickHard={newGame}/>)}
             </svg>
         </>
     );
