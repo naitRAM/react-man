@@ -8,6 +8,8 @@ const HangmanWord = ({ word, row, y, x, guessColors}) => {
                 // a fix for spacing issues between text elements with narrow letters
                 if (word[i] == "I") {
                     x += 25;
+                } else if (word[i] == "J") {
+                    x += 30;
                 }
                 else if ("MW".includes(word[i])) {
                     x += 50;
