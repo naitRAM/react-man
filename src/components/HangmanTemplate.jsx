@@ -172,9 +172,11 @@ const HangmanTemplate = () => {
                 throw new Error("no phrases in phraseArray in phrases.json")
             }
             let randomChoice = Math.floor(Math.random() * phrases.length);
+            console.log(phrases.length);
             const newPhrases = [...phrases];
             dataObj = newPhrases.splice(randomChoice, 1)[0];
             newPhrases.length == 0 ? setPhrases(phraseArray) : setPhrases(newPhrases);
+        
         } catch (err) {
             console.log(err);
             setLoading(false);
