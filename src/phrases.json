@@ -1,19 +1,5 @@
 {
-    "phrases": [
-        {
-            "phrase": "Hotel California",
-            "category": "Music",
-            "hint": "No checkout"
-        },
-        {
-            "phrase": "Mount Kilimanjaro",
-            "category": "Landmarks",
-            "hint": "Somewhere in Africa"
-        },
-        {
-            "phrase": "Platypus",
-            "category": "Animals",
-            "hint": "An unusual mammal"
-        }
+    "phraseArray": [
+    
     ]
 }

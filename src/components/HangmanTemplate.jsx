@@ -16,9 +16,10 @@ import HangmanHintLabel from './HangmanHintLabel';
 import HangmanInput from './HangmanInput';
 import HangmanEasyButton from './HangmanEasyButton';
 import HangmanHardButton from './HangmanHardButton';
-
+import { phraseArray } from '../phrases.json';
 
 const HangmanTemplate = () => {
+    const [phrases, setPhrases] = useState(phraseArray);
     const [phrase, setPhrase] = useState('');
     const [guessed, setGuessed] = useState([]);
     const [guessedColors, setGuessedColors] = useState([]);
@@ -160,7 +161,6 @@ const HangmanTemplate = () => {
     }
 
     const newGame = async (e) => {
-        let data;
         let dataObj;
         setErrorLoading(false);
         setLoading(true);
@@ -168,11 +168,15 @@ const HangmanTemplate = () => {
         setGuessed('Loading...'.toUpperCase().split(' '));
         setXLimit(900);
         try {
-            const res = await fetch('/api/phrases');
-            data = await res.json();
-            dataObj = data[Math.floor(Math.random() * data.length)];
-        } catch (error) {
-            console.log('error');
+            if (phraseArray.length == 0) {
+                throw new Error("no phrases in phraseArray in phrases.json")
+            }
+            let randomChoice = Math.floor(Math.random() * phrases.length);
+            const newPhrases = [...phrases];
+            dataObj = newPhrases.splice(randomChoice, 1)[0];
+            newPhrases.length == 0 ? setPhrases(phraseArray) : setPhrases(newPhrases);
+        } catch (err) {
+            console.log(err);
             setLoading(false);
             setErrorLoading(true);
             setGuessedColors(getDefaultGuessedColors('Error Loading Phrase'.toLowerCase().split(' ')));
